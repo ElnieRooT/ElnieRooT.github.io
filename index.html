@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elnie Android Rooting — Bootloader Unlock, Magisk Root & Custom ROMs</title>
+<meta name="description" content="Professional Android rooting and software services. Bootloader unlock, Magisk root, custom ROM installation, TWRP/OrangeFox recovery, unbrick & performance optimization.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050705; --bg2:#0a0f0a; --panel:rgba(20,28,18,0.55); --panel-solid:#0d130d;
+  --line:rgba(166,255,58,0.14); --line-strong:rgba(166,255,58,0.35);
+  --green:#a6ff3a; --green2:#6ee83a; --green-dim:#4c7a1f; --green-glow:rgba(166,255,58,0.45);
+  --text:#f2fbe9; --text-dim:#9db296; --amber:#ffcf4a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:
+    radial-gradient(ellipse 60% 40% at 15% -5%, rgba(166,255,58,0.12), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 100% 10%, rgba(166,255,58,0.08), transparent 50%),
+    radial-gradient(ellipse 60% 50% at 50% 100%, rgba(166,255,58,0.06), transparent 50%),
+    var(--bg);
+  color:var(--text); font-family:'Inter',sans-serif; overflow-x:hidden; position:relative;
+}
+::selection{background:var(--green); color:#050705;}
+a{color:inherit;text-decoration:none;}
+.mono{font-family:'JetBrains Mono',monospace;}
+img{max-width:100%;display:block;}
+
+#loader{
+  position:fixed; inset:0; z-index:999; background:#050705;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px;
+  transition:opacity .6s ease, visibility .6s ease;
+}
+#loader.hide{opacity:0; visibility:hidden;}
+.load-logo{font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.4rem; letter-spacing:2px;}
+.load-logo .g{color:var(--green); text-shadow:0 0 20px var(--green-glow);}
+.load-bar{width:180px; height:3px; background:#152012; border-radius:3px; overflow:hidden;}
+.load-bar i{display:block; height:100%; width:0%; background:var(--green); box-shadow:0 0 12px var(--green); animation:load 1.4s ease forwards;}
+@keyframes load{ to{width:100%;} }
+.load-txt{font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--text-dim); letter-spacing:1.5px;}
+
+#particles{position:fixed; inset:0; z-index:0; pointer-events:none;}
+.particle{position:absolute; width:3px; height:3px; background:var(--green); border-radius:50%; opacity:0.5; box-shadow:0 0 6px var(--green); animation:float 12s linear infinite;}
+@keyframes float{ 0%{transform:translateY(110vh) translateX(0); opacity:0;} 10%{opacity:.6;} 90%{opacity:.4;} 100%{transform:translateY(-10vh) translateX(30px); opacity:0;} }
+
+.grid-bg{position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:linear-gradient(rgba(166,255,58,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(166,255,58,0.035) 1px, transparent 1px);
+  background-size:42px 42px; mask-image:radial-gradient(ellipse 80% 70% at 50% 0%, black 20%, transparent 75%);}
+
+section, header, footer{position:relative; z-index:1;}
+
+header{position:sticky; top:0; z-index:80; display:flex; align-items:center; justify-content:space-between; padding:16px 24px;
+  background:rgba(5,7,5,0.75); backdrop-filter:blur(14px); border-bottom:1px solid var(--line);}
+.brand{display:flex; align-items:center; gap:9px; font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.05rem;}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green),0 0 22px var(--green-glow);animation:pulse 2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+nav.links{display:flex; gap:22px; font-size:0.83rem; color:var(--text-dim);}
+nav.links a:hover{color:var(--green);}
+.btn-nav{border:1px solid var(--green-dim); color:var(--green); padding:8px 15px; border-radius:6px; font-size:0.8rem; font-family:'JetBrains Mono',monospace; transition:.2s;}
+.btn-nav:hover{background:var(--green); color:#050705; box-shadow:0 0 18px var(--green-glow);}
+.burger{display:none; flex-direction:column; gap:4px; cursor:pointer;}
+.burger span{width:22px;height:2px;background:var(--green);}
+
+.btn-primary{background:var(--green); color:#050705; font-weight:700; padding:14px 24px; border-radius:8px; font-size:0.92rem; display:inline-flex; align-items:center; gap:8px; transition:transform .18s, box-shadow .18s; border:none; cursor:pointer;}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 34px var(--green-glow);}
+.btn-ghost{border:1px solid var(--line-strong); color:var(--text); padding:13px 22px; border-radius:8px; font-size:0.92rem; transition:.18s; backdrop-filter:blur(6px);}
+.btn-ghost:hover{border-color:var(--green); color:var(--green); box-shadow:0 0 20px rgba(166,255,58,0.15);}
+
+.glass{background:var(--panel); border:1px solid var(--line); border-radius:16px; backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);}
+
+.hero{max-width:1200px; margin:0 auto; padding:100px 24px 70px; text-align:center;}
+.eyebrow{display:inline-flex; align-items:center; gap:8px; font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:2px; color:var(--green); text-transform:uppercase; border:1px solid var(--green-dim); padding:6px 14px; border-radius:20px; margin-bottom:26px; background:rgba(166,255,58,0.05);}
+.hero-logo{width:70px; height:70px; margin:0 auto 24px; border-radius:18px; background:linear-gradient(160deg, var(--green), #4c9a1f); display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-weight:800; font-size:1.6rem; color:#050705; box-shadow:0 0 50px var(--green-glow); animation:logoFloat 3.5s ease-in-out infinite;}
+@keyframes logoFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+h1{font-family:'JetBrains Mono',monospace; font-weight:800; font-size:clamp(2.2rem,6vw,3.8rem); line-height:1.05; letter-spacing:-1px;}
+h1 .accent{color:var(--green); text-shadow:0 0 40px var(--green-glow);}
+.hero .sub{margin:20px auto 0; color:var(--text-dim); font-size:1.05rem; max-width:56ch; line-height:1.65;}
+.hero-ctas{display:flex; gap:14px; justify-content:center; margin-top:36px; flex-wrap:wrap;}
+
+.stats{max-width:1000px; margin:56px auto 0; display:grid; grid-template-columns:repeat(3,1fr); gap:16px; padding:0 24px;}
+.stat{padding:24px 18px; text-align:center;}
+.stat .n{font-family:'JetBrains Mono',monospace; font-weight:800; font-size:2rem; color:var(--green); text-shadow:0 0 20px var(--green-glow);}
+.stat .l{font-size:0.78rem; color:var(--text-dim); margin-top:6px; letter-spacing:0.3px;}
+
+.sec-head{max-width:1200px; margin:0 auto; padding:0 24px 40px; text-align:left;}
+.sec-head h2{font-family:'JetBrains Mono',monospace; font-size:clamp(1.5rem,3vw,2.1rem); font-weight:800; letter-spacing:-0.5px;}
+.sec-head p{color:var(--text-dim); margin-top:10px; max-width:60ch;}
+section.block{max-width:1200px; margin:0 auto; padding:70px 24px; border-top:1px solid var(--line);}
+
+.svc-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+.svc-card{padding:26px; transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;}
+.svc-card:hover{transform:translateY(-4px); border-color:var(--line-strong); box-shadow:0 16px 40px rgba(0,0,0,0.4), 0 0 30px rgba(166,255,58,0.08);}
+.svc-icon{width:44px; height:44px; border-radius:10px; background:rgba(166,255,58,0.08); border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; font-size:1.25rem; margin-bottom:16px;}
+.svc-card h3{font-size:1.02rem; margin-bottom:8px; font-weight:700;}
+.svc-card p{color:var(--text-dim); font-size:0.85rem; line-height:1.55; margin-bottom:16px;}
+.svc-foot{display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--line); padding-top:14px;}
+.svc-price{font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--green);}
+.svc-msg{font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--text-dim); border:1px solid var(--line); padding:6px 10px; border-radius:6px; transition:.2s;}
+.svc-msg:hover{color:var(--green); border-color:var(--green-dim);}
+
+.brand-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px;}
+.brand-chip{padding:20px 10px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--text-dim); transition:.2s;}
+.brand-chip:hover{color:var(--green); border-color:var(--green-dim);}
+.brand-chip small{display:block; font-size:0.65rem; color:#5b6b57; margin-top:4px;}
+
+.price-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
+.price-card{padding:28px 24px; display:flex; flex-direction:column; gap:16px;}
+.price-card.featured{border-color:var(--green); box-shadow:0 0 40px rgba(166,255,58,0.12); position:relative;}
+.price-card.featured::before{content:'MOST POPULAR'; position:absolute; top:-11px; left:50%; transform:translateX(-50%); background:var(--green); color:#050705; font-family:'JetBrains Mono',monospace; font-size:0.6rem; font-weight:700; padding:4px 10px; border-radius:20px; letter-spacing:1px;}
+.price-tier{font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--green); letter-spacing:1.5px;}
+.price-card h3{font-size:1.25rem;}
+.price-card ul{list-style:none; display:flex; flex-direction:column; gap:9px; font-size:0.84rem; color:var(--text-dim);}
+.price-card ul li::before{content:'✓ '; color:var(--green); font-weight:700;}
+.price-card .price-tag{font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-dim); border-top:1px solid var(--line); padding-top:14px;}
+
+.why-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+.why-card{padding:24px; text-align:left;}
+.why-card .ic{color:var(--green); font-size:1.3rem; margin-bottom:12px;}
+.why-card h4{margin-bottom:6px; font-size:0.98rem;}
+.why-card p{color:var(--text-dim); font-size:0.83rem; line-height:1.5;}
+
+.placeholder{padding:40px; text-align:center; border-style:dashed;}
+.placeholder .tag{font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--amber); letter-spacing:1.5px; border:1px solid #4a3a17; background:rgba(255,207,74,0.06); padding:5px 12px; border-radius:20px; display:inline-block; margin-bottom:14px;}
+.placeholder p{color:var(--text-dim); font-size:0.88rem; max-width:50ch; margin:0 auto; line-height:1.6;}
+
+.faq-item{border-bottom:1px solid var(--line); padding:20px 4px;}
+.faq-q{display:flex; justify-content:space-between; align-items:center; cursor:pointer; font-weight:600; font-size:0.96rem;}
+.faq-q .plus{color:var(--green); font-family:'JetBrains Mono',monospace; transition:transform .25s;}
+.faq-item.open .plus{transform:rotate(45deg);}
+.faq-a{max-height:0; overflow:hidden; transition:max-height .3s ease; color:var(--text-dim); font-size:0.87rem; line-height:1.6;}
+.faq-item.open .faq-a{max-height:200px; padding-top:12px;}
+
+.tips-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+.tip-card{padding:22px;}
+.tip-card .tag{font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--green); letter-spacing:1px; margin-bottom:10px; display:block;}
+.tip-card h4{font-size:0.95rem; margin-bottom:8px;}
+.tip-card p{color:var(--text-dim); font-size:0.83rem; line-height:1.55;}
+
+.contact-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+.contact-card{padding:30px;}
+.contact-card h3{margin-bottom:14px; font-size:1.1rem;}
+.contact-card p{color:var(--text-dim); font-size:0.87rem; line-height:1.6; margin-bottom:18px;}
+.contact-row{display:flex; align-items:center; gap:10px; margin-bottom:10px; font-size:0.85rem; color:var(--text-dim);}
+.contact-row .dotcol{width:8px;height:8px;border-radius:50%;background:var(--green); box-shadow:0 0 8px var(--green);}
+
+.warning-inner{border:1px solid #4a3a17; background:rgba(255,207,74,0.05); border-radius:12px; padding:20px 22px; font-size:0.85rem; color:#d8c795; line-height:1.6;}
+.warning-inner b{color:var(--amber);}
+.warning-inner ul{margin-top:10px; padding-left:20px;}
+
+footer{border-top:1px solid var(--line); padding:34px 24px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; color:var(--text-dim); font-size:0.8rem;}
+
+.float-wa{position:fixed; bottom:24px; right:24px; z-index:70; width:58px; height:58px; border-radius:50%; background:var(--green); color:#050705; display:flex; align-items:center; justify-content:center; font-size:1.5rem; box-shadow:0 0 30px var(--green-glow), 0 8px 24px rgba(0,0,0,0.5); animation:wafloat 2.5s ease-in-out infinite;}
+@keyframes wafloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+.float-top{position:fixed; bottom:24px; left:24px; z-index:70; width:44px; height:44px; border-radius:50%; background:rgba(20,28,18,0.7); border:1px solid var(--line-strong); backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; color:var(--green); opacity:0; pointer-events:none; transition:opacity .3s;}
+.float-top.show{opacity:1; pointer-events:auto;}
+
+.reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
+.reveal.in{opacity:1; transform:translateY(0);}
+
+@media (max-width:900px){
+  nav.links{display:none;}
+  .burger{display:flex;}
+  .svc-grid, .brand-grid, .price-grid, .why-grid, .tips-grid, .contact-grid{grid-template-columns:1fr 1fr;}
+  .stats{grid-template-columns:1fr; gap:12px;}
+}
+@media (max-width:600px){
+  .svc-grid, .brand-grid, .price-grid, .why-grid, .tips-grid, .contact-grid{grid-template-columns:1fr;}
+}
+@media (prefers-reduced-motion: reduce){ *{animation:none !important; transition:none !important;} }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="load-logo">ELNIE<span class="g">.root</span></div>
+  <div class="load-bar"><i></i></div>
+  <div class="load-txt">BOOTING SYSTEM...</div>
+</div>
+
+<div class="grid-bg"></div>
+<div id="particles"></div>
+
+<header>
+  <div class="brand"><span class="dot"></span>ELNIE<span style="color:var(--text-dim); font-weight:500;">.root</span></div>
+  <nav class="links">
+    <a href="#services">Services</a>
+    <a href="#brands">Brands</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <a class="btn-nav" id="wa-header" href="#" target="_blank" rel="noopener">WhatsApp →</a>
+  <div class="burger" onclick="document.querySelector('nav.links').classList.toggle('mobile-open')"><span></span><span></span><span></span></div>
+</header>
+
+<section class="hero">
+  <div class="eyebrow reveal in">● safe · fast · professional</div>
+  <div class="hero-logo">E</div>
+  <h1>ELNIE <span class="accent">ANDROID</span><br>ROOTING</h1>
+  <p class="sub">Professional Android rooting &amp; software services — bootloader unlock, Magisk root, custom ROM installation, and recovery, done carefully with a free compatibility check first.</p>
+  <div class="hero-ctas">
+    <a class="btn-primary" id="wa-hero" href="#" target="_blank" rel="noopener">💬 WhatsApp</a>
+    <a class="btn-ghost" href="#services">📋 View Services</a>
+    <a class="btn-ghost" href="#pricing">💰 Get a Quote</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat glass reveal"><div class="n" id="brand-count">0</div><div class="l">Supported Device Brands</div></div>
+    <div class="stat glass reveal"><div class="n">Free</div><div class="l">Compatibility Check</div></div>
+    <div class="stat glass reveal"><div class="n">100%</div><div class="l">Backup-First Process</div></div>
+  </div>
+</section>
+
+<section class="block" id="services">
+  <div class="sec-head reveal">
+    <div class="eyebrow" style="margin-bottom:14px;">what we do</div>
+    <h2>Full-service Android software work.</h2>
+    <p>Every job starts with a free compatibility check for your exact model. Prices are quoted after checking your device — message for current pricing.</p>
+  </div>
+  <div class="svc-grid">
+    <div class="svc-card glass reveal"><div class="svc-icon">🔓</div><h3>Bootloader Unlock</h3><p>Unlock the bootloader on supported devices — the first step toward full customization.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+    <div class="svc-card glass reveal"><div class="svc-icon">⚡</div><h3>Magisk Root</h3><p>Systemless root access — keep OTA updates and hide root from apps that check for it.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+    <div class="svc-card glass reveal"><div class="svc-icon">💻</div><h3>Custom ROM Installation</h3><p>Flash a custom ROM suited to your device — performance, battery, or clean stock feel.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+    <div class="svc-card glass reveal"><div class="svc-icon">⚙️</div><h3>TWRP Installation</h3><p>Install TWRP custom recovery so you can flash, back up, and restore safely.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+    <div class="svc-card glass reveal"><div class="svc-icon">🔄</div><h3>OrangeFox Recovery</h3><p>Alternative custom recovery installation for devices that support it.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+    <div class="svc-card glass reveal"><div class="svc-icon">🛡</div><h3>Root Hide Setup</h3><p>Configure root hiding so select apps don't detect root status.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+    <div class="svc-card glass reveal"><div class="svc-icon">📱</div><h3>Performance Optimization</h3><p>Post-root tuning for smoother performance and better battery behavior.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+    <div class="svc-card glass reveal"><div class="svc-icon">🔧</div><h3>Bootloop Repair</h3><p>Stuck in a bootloop? Recovery service for supported devices to get you booting again.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+    <div class="svc-card glass reveal"><div class="svc-icon">🚑</div><h3>Soft Brick Recovery</h3><p>Recovery from a soft-bricked state for supported devices.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+    <div class="svc-card glass reveal"><div class="svc-icon">📂</div><h3>Backup &amp; Restore</h3><p>Full device backup before any work, with restore support if needed.</p><div class="svc-foot"><span class="svc-price">Message for pricing</span><a class="svc-msg" href="#" data-wa>Message →</a></div></div>
+  </div>
+</section>
+
+<section class="block" id="brands">
+  <div class="sec-head reveal">
+    <div class="eyebrow" style="margin-bottom:14px;">device coverage</div>
+    <h2>Supported brands.</h2>
+    <p>Selected models per brand — send your exact device name for a free compatibility check before booking.</p>
+  </div>
+  <div class="brand-grid">
+    <div class="brand-chip glass reveal">Samsung<small>selected models</small></div>
+    <div class="brand-chip glass reveal">Xiaomi</div>
+    <div class="brand-chip glass reveal">Redmi</div>
+    <div class="brand-chip glass reveal">POCO</div>
+    <div class="brand-chip glass reveal">Google Pixel</div>
+    <div class="brand-chip glass reveal">OnePlus</div>
+    <div class="brand-chip glass reveal">Nothing</div>
+    <div class="brand-chip glass reveal">ASUS</div>
+    <div class="brand-chip glass reveal">Motorola</div>
+    <div class="brand-chip glass reveal">Sony</div>
+    <div class="brand-chip glass reveal">Oppo<small>selected models</small></div>
+    <div class="brand-chip glass reveal">vivo<small>selected models</small></div>
+    <div class="brand-chip glass reveal">Realme<small>selected models</small></div>
+  </div>
+</section>
+
+<section class="block" id="pricing">
+  <div class="sec-head reveal">
+    <div class="eyebrow" style="margin-bottom:14px;">packages</div>
+    <h2>Pricing tiers.</h2>
+    <p><b style="color:var(--amber);">Note:</b> exact prices depend on your device model — these are package structures. Message on WhatsApp with your model for a real quote.</p>
+  </div>
+  <div class="price-grid">
+    <div class="price-card glass reveal"><span class="price-tier">BASIC</span><h3>Bootloader Unlock</h3><ul><li>Unlock bootloader</li><li>Compatibility check</li><li>Backup guidance</li></ul><div class="price-tag">Message for pricing</div><a class="btn-ghost" href="#" data-wa style="text-align:center;">Message Now</a></div>
+    <div class="price-card glass reveal featured"><span class="price-tier">STANDARD</span><h3>Magisk Root</h3><ul><li>Everything in Basic</li><li>Magisk root install</li><li>Root hide setup</li></ul><div class="price-tag">Message for pricing</div><a class="btn-primary" href="#" data-wa style="text-align:center; justify-content:center;">Message Now</a></div>
+    <div class="price-card glass reveal"><span class="price-tier">PREMIUM</span><h3>Root + Recovery</h3><ul><li>Everything in Standard</li><li>TWRP / OrangeFox</li><li>Performance tuning</li></ul><div class="price-tag">Message for pricing</div><a class="btn-ghost" href="#" data-wa style="text-align:center;">Message Now</a></div>
+    <div class="price-card glass reveal"><span class="price-tier">ULTIMATE</span><h3>Custom ROM + Root</h3><ul><li>Everything in Premium</li><li>Custom ROM install</li><li>Full setup &amp; support</li></ul><div class="price-tag">Message for pricing</div><a class="btn-ghost" href="#" data-wa style="text-align:center;">Message Now</a></div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="sec-head reveal">
+    <div class="eyebrow" style="margin-bottom:14px;">why elnie</div>
+    <h2>Why choose me.</h2>
+  </div>
+  <div class="why-grid">
+    <div class="why-card glass reveal"><div class="ic">✔</div><h4>Professional Service</h4><p>Careful, methodical work on every device — no shortcuts.</p></div>
+    <div class="why-card glass reveal"><div class="ic">✔</div><h4>Device Compatibility Check</h4><p>Free check on your exact model before anything is booked.</p></div>
+    <div class="why-card glass reveal"><div class="ic">✔</div><h4>Fast Response</h4><p>Quick replies on WhatsApp — no waiting around for answers.</p></div>
+    <div class="why-card glass reveal"><div class="ic">✔</div><h4>Honest Pricing</h4><p>Clear quotes based on your device, no hidden fees.</p></div>
+    <div class="why-card glass reveal"><div class="ic">✔</div><h4>Customer Support</h4><p>Reachable after the job for questions about your setup.</p></div>
+    <div class="why-card glass reveal"><div class="ic">✔</div><h4>Quality Work</h4><p>Backup-first process to protect your data throughout.</p></div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="sec-head reveal">
+    <div class="eyebrow" style="margin-bottom:14px;">gallery</div>
+    <h2>Completed work.</h2>
+  </div>
+  <div class="placeholder glass reveal">
+    <span class="tag">⚠ NEEDS YOUR PHOTOS</span>
+    <p>This is where before/after screenshots of completed rooting jobs go. Send me the actual photos you'd like featured and I'll build this section out properly — I can't invent images of your work.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="sec-head reveal">
+    <div class="eyebrow" style="margin-bottom:14px;">reviews</div>
+    <h2>Customer reviews.</h2>
+  </div>
+  <div class="placeholder glass reveal">
+    <span class="tag">⚠ NEEDS REAL REVIEWS</span>
+    <p>Once you have real customer feedback, send it over (with their permission) and I'll add scrolling review cards here. I won't fabricate testimonials — that would be misleading to visitors.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="sec-head reveal">
+    <div class="eyebrow" style="margin-bottom:14px;">learn</div>
+    <h2>Android rooting basics.</h2>
+    <p>General information — always get a compatibility check before deciding.</p>
+  </div>
+  <div class="tips-grid">
+    <div class="tip-card glass reveal"><span class="tag mono">GUIDE</span><h4>What is Magisk?</h4><p>Magisk is a systemless rooting method that modifies your device without touching the system partition, which is why it's the most common root tool today.</p></div>
+    <div class="tip-card glass reveal"><span class="tag mono">GUIDE</span><h4>How custom ROMs work</h4><p>A custom ROM replaces your phone's stock Android software with a community-built alternative, often for extra features or longer update support.</p></div>
+    <div class="tip-card glass reveal"><span class="tag mono">GUIDE</span><h4>Rooting: benefits &amp; risks</h4><p>Rooting unlocks deep customization and ad-blocking at the system level, but it can void your warranty and break apps that check for root.</p></div>
+  </div>
+</section>
+
+<section class="block" id="faq">
+  <div class="sec-head reveal">
+    <div class="eyebrow" style="margin-bottom:14px;">faq</div>
+    <h2>Frequently asked questions.</h2>
+  </div>
+  <div class="glass reveal" style="padding:8px 24px;">
+    <div class="faq-item"><div class="faq-q">Is rooting safe? <span class="plus">+</span></div><div class="faq-a">When done correctly on a supported device, yes — but there's always some risk. That's why a free compatibility check and backup come first on every job.</div></div>
+    <div class="faq-item"><div class="faq-q">Will I lose my warranty? <span class="plus">+</span></div><div class="faq-a">Usually, yes. Rooting and bootloader unlocking typically void the manufacturer's warranty. This is disclosed before any work begins.</div></div>
+    <div class="faq-item"><div class="faq-q">Can I unroot my device? <span class="plus">+</span></div><div class="faq-a">In most cases yes, though the process depends on your device and how it was rooted. Ask during your compatibility check.</div></div>
+    <div class="faq-item"><div class="faq-q">Will banking apps still work? <span class="plus">+</span></div><div class="faq-a">Some banking and payment apps detect root and may stop working or need extra hiding setup. This is discussed upfront so there are no surprises.</div></div>
+    <div class="faq-item"><div class="faq-q">How long does it take? <span class="plus">+</span></div><div class="faq-a">It depends on the device and service — ask for a time estimate during your compatibility check.</div></div>
+    <div class="faq-item"><div class="faq-q">What phones do you support? <span class="plus">+</span></div><div class="faq-a">Samsung, Xiaomi, Redmi, POCO, Pixel, OnePlus, Nothing, ASUS, Motorola, Sony, and selected Oppo/vivo/Realme models. Send your exact model to confirm.</div></div>
+  </div>
+</section>
+
+<section class="block" id="contact">
+  <div class="sec-head reveal">
+    <div class="eyebrow" style="margin-bottom:14px;">get in touch</div>
+    <h2>Send your device model. Get a free check.</h2>
+  </div>
+  <div class="contact-grid">
+    <div class="contact-card glass reveal">
+      <h3>Message Elnie</h3>
+      <p>Fastest way to reach me is WhatsApp — send your device model for a free compatibility check.</p>
+      <div class="contact-row"><span class="dotcol"></span>WhatsApp — quick replies</div>
+      <a class="btn-primary" id="wa-contact" href="#" target="_blank" rel="noopener" style="margin-top:10px;">💬 Chat on WhatsApp</a>
+    </div>
+    <div class="contact-card glass reveal">
+      <h3>Business hours &amp; location</h3>
+      <p><span style="color:var(--amber);">⚠ Placeholder —</span> tell me your actual hours and whether you want a location listed, and I'll fill this in accurately.</p>
+      <div class="contact-row"><span class="dotcol"></span>Hours: <span style="color:var(--text-dim);">— add your hours —</span></div>
+      <div class="contact-row"><span class="dotcol"></span>Location: <span style="color:var(--text-dim);">— optional —</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="warning-inner glass reveal">
+    <b>⚠ Disclaimer</b>
+    <ul>
+      <li>Rooting and bootloader unlocking may void your device's warranty.</li>
+      <li>Bootloader unlocking often wipes all data on the device — back up first.</li>
+      <li>Some apps (e.g. banking apps) may stop working or require extra setup.</li>
+      <li>Only supported devices/models are accepted — a free compatibility check confirms this.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="brand mono"><span class="dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:8px;"></span>ELNIE.root</div>
+  <div>Android Rooting &amp; Software Services</div>
+</footer>
+
+<a class="float-wa" id="wa-float" href="#" target="_blank" rel="noopener" title="Message on WhatsApp">💬</a>
+<a class="float-top" id="top-btn" href="#top">↑</a>
+
+<script>
+const waNumber = "639948620084";
+const waMsg = encodeURIComponent("Hi Elnie! I'd like a free compatibility check for my phone. My device model is: ");
+const waLink = `https://wa.me/${waNumber}?text=${waMsg}`;
+document.querySelectorAll('#wa-header,#wa-hero,#wa-contact,#wa-float,[data-wa]').forEach(el => el.href = waLink);
+
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('loader').classList.add('hide'), 1200);
+});
+
+const pWrap = document.getElementById('particles');
+for(let i=0;i<28;i++){
+  const p = document.createElement('div');
+  p.className='particle';
+  p.style.left = Math.random()*100+'vw';
+  p.style.animationDelay = (Math.random()*12)+'s';
+  p.style.animationDuration = (9+Math.random()*8)+'s';
+  pWrap.appendChild(p);
+}
+
+const brandTarget = 13;
+const brandEl = document.getElementById('brand-count');
+let cur = 0;
+const brandTimer = setInterval(()=>{
+  cur++; brandEl.textContent = cur+'+';
+  if(cur>=brandTarget) clearInterval(brandTimer);
+}, 70);
+
+const obs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); } });
+},{threshold:0.12});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+document.querySelectorAll('.faq-item').forEach(item=>{
+  item.querySelector('.faq-q').addEventListener('click', ()=>{
+    const wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+    if(!wasOpen) item.classList.add('open');
+  });
+});
+
+window.addEventListener('scroll', ()=>{
+  document.getElementById('top-btn').classList.toggle('show', window.scrollY > 500);
+});
+</script>
+</body>
+</html>
