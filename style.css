@@ -1,0 +1,264 @@
+:root {
+    --bg-color: #050505;
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --primary: #00D084;
+    --secondary: #3B82F6;
+    --text-main: #FFFFFF;
+    --text-sec: #CFCFCF;
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+/* Global Reset & Typography */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand {
+    font-family: var(--font-heading);
+}
+
+.text-secondary-custom { color: var(--text-sec); }
+.fs-sm { font-size: 0.875rem; }
+.py-6 { padding-top: 6rem; padding-bottom: 6rem; }
+.bg-texture { background: linear-gradient(180deg, rgba(5,5,5,1) 0%, rgba(20,20,20,0.5) 50%, rgba(5,5,5,1) 100%); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
+/* Loader */
+#loader {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-color);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.6s ease;
+}
+.loader-content { text-align: center; }
+.loader-icon { font-size: 3rem; color: var(--primary); margin-bottom: 1rem; animation: pulse 1.5s infinite; filter: drop-shadow(0 0 10px var(--primary)); }
+.loader-bar { width: 150px; height: 2px; background: rgba(255,255,255,0.1); margin: 1rem auto; position: relative; overflow: hidden; }
+.loader-bar::after { content: ''; position: absolute; top: 0; left: -50%; width: 50%; height: 100%; background: var(--primary); animation: load 1s infinite ease-in-out; }
+
+@keyframes load { 100% { left: 100%; } }
+@keyframes pulse { 50% { opacity: 0.5; } }
+
+/* Scroll Progress */
+#scroll-progress {
+    position: fixed;
+    top: 0; left: 0; width: 0%; height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    z-index: 1050;
+    transition: width 0.1s ease;
+}
+
+/* Glassmorphism Utilities */
+.glass-nav {
+    background: rgba(5, 5, 5, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--card-border);
+    transition: all 0.3s ease;
+}
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.glass-badge {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(4px);
+    color: var(--text-sec);
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+/* Colors & Gradients */
+.text-gradient {
+    background: linear-gradient(90deg, var(--text-main) 0%, var(--text-sec) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.text-primary-glow {
+    color: var(--primary);
+    text-shadow: 0 0 20px rgba(0, 208, 132, 0.5);
+}
+.border-emerald {
+    border-color: rgba(0, 208, 132, 0.3) !important;
+    box-shadow: 0 0 30px rgba(0, 208, 132, 0.05);
+}
+
+/* Buttons */
+.btn-primary-glow {
+    background: var(--primary);
+    color: #000;
+    border: none;
+    box-shadow: 0 0 20px rgba(0, 208, 132, 0.3);
+    transition: all 0.3s ease;
+}
+.btn-primary-glow:hover {
+    background: #00e691;
+    color: #000;
+    box-shadow: 0 0 30px rgba(0, 208, 132, 0.6);
+    transform: translateY(-2px);
+}
+.btn-glass {
+    background: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+}
+.btn-glass:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-main);
+    transform: translateY(-2px);
+}
+
+/* Hero Section */
+.hero-section {
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+}
+#particles-js {
+    position: absolute;
+    width: 100%; height: 100%;
+    top: 0; left: 0;
+    z-index: 1;
+}
+.hero-gradient-overlay {
+    position: absolute;
+    bottom: 0; left: 0; width: 100%; height: 30%;
+    background: linear-gradient(0deg, var(--bg-color) 0%, transparent 100%);
+    z-index: 2;
+}
+
+/* Interactive Cards */
+.service-card:hover, .pricing-card:hover {
+    transform: translateY(-10px);
+    border-color: rgba(255,255,255,0.2);
+}
+.icon-wrapper {
+    width: 64px; height: 64px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+}
+
+/* Specifics */
+.brand-pill {
+    transition: all 0.3s ease;
+    cursor: default;
+}
+.brand-pill:hover {
+    background: rgba(255,255,255,0.1);
+    color: var(--text-main) !important;
+}
+
+/* Form inputs */
+.glass-input {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+}
+.glass-input:focus {
+    background: rgba(0,0,0,0.4);
+    border-color: var(--primary);
+    color: var(--text-main);
+    box-shadow: 0 0 0 0.25rem rgba(0, 208, 132, 0.25);
+}
+.glass-input::placeholder { color: rgba(255,255,255,0.3); }
+
+/* Pricing Badge */
+.popular-badge {
+    position: absolute;
+    top: 15px; right: -30px;
+    background: var(--primary);
+    color: #000;
+    font-size: 0.7rem; font-weight: bold;
+    padding: 5px 30px;
+    transform: rotate(45deg);
+}
+
+/* Payment QR */
+.qr-placeholder {
+    width: 150px; height: 150px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    border: 1px dashed var(--card-border);
+}
+
+/* Accordion Customization */
+.custom-accordion .accordion-button:not(.collapsed) {
+    background-color: rgba(255,255,255,0.05);
+    color: var(--primary);
+}
+.custom-accordion .accordion-button::after {
+    filter: invert(1);
+}
+
+/* Floating Elements */
+#floating-whatsapp, #back-to-top {
+    position: fixed;
+    right: 30px;
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 1.5rem;
+    z-index: 1000;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+#floating-whatsapp {
+    bottom: 30px;
+    background: var(--card-bg);
+}
+#floating-whatsapp:hover {
+    background: var(--primary); color: #000 !important;
+    box-shadow: 0 0 20px rgba(0,208,132,0.5);
+    transform: scale(1.1);
+}
+#back-to-top {
+    bottom: 90px;
+    opacity: 0; pointer-events: none;
+    background: rgba(255,255,255,0.05);
+}
+#back-to-top.visible {
+    opacity: 1; pointer-events: auto;
+}
+#back-to-top:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Background Glow Orbs */
+.glow-orb {
+    position: absolute;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+    opacity: 0.15;
+}
+.blue-orb { background: var(--secondary); top: 10%; left: -10%; }
+
+.whatsapp-big { transition: all 0.3s ease; }
+.whatsapp-big:hover { transform: scale(1.05); }
+.hover-white:hover { color: var(--text-main) !important; }
+.space-y-3 li { margin-bottom: 0.75rem; }
